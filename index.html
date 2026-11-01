@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>My Budget — Personal Finance Tracker</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--ink:#172033;--muted:#748096;--line:#e7ebf2;--accent:#6758e8;--accent2:#8b7cf6;--green:#15966b;--red:#d65363;--shadow:0 12px 35px rgba(25,35,60,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(120deg,#111a2b,#24204e);color:white;padding:26px 20px 72px}
+.wrap{max-width:1080px;margin:auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-size:22px;font-weight:800;letter-spacing:-.5px}.brand span{color:#aaa0ff}.sub{color:#c2c8d8;font-size:13px;margin-top:4px}
+.month{border:1px solid #ffffff35;background:#ffffff12;color:white;border-radius:12px;padding:9px 12px;font:inherit}
+main{max-width:1080px;margin:-48px auto 40px;padding:0 18px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.metric .label{font-size:12px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.6px}
+.metric .value{font-size:clamp(21px,3vw,29px);font-weight:800;margin-top:7px;letter-spacing:-.7px}
+.metric .hint{font-size:12px;color:var(--muted);margin-top:4px}.metric.balance .value{color:var(--green)}
+.layout{display:grid;grid-template-columns: minmax(280px,.85fr) minmax(0,1.5fr);gap:18px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);margin-bottom:18px}
+h2{font-size:17px;margin:0 0 4px;letter-spacing:-.3px}.desc{font-size:12px;color:var(--muted);margin:0 0 17px}
+label{display:block;font-size:12px;font-weight:700;color:#536078;margin:0 0 6px}
+input,select{width:100%;border:1px solid #dfe4ed;border-radius:11px;padding:11px 12px;background:#fff;color:var(--ink);font:inherit;outline:none;min-width:0}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #6758e81a}
+.field{margin-bottom:13px}.rowfields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addcat{display:flex;gap:8px;margin-top:8px}.addcat input{flex:1}.addcat button{white-space:nowrap}
+button{border:0;border-radius:11px;padding:11px 14px;font:700 13px inherit;cursor:pointer;transition:.15s}
+.primary{background:var(--accent);color:white;width:100%;padding:13px}.primary:hover{background:#5546d4}
+.ghost{background:#f0efff;color:#5143ce}.danger{background:#fff0f1;color:var(--red);padding:7px 10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+.salarybox{display:flex;gap:10px;align-items:end}.salarybox .field{flex:1;margin:0}.salarybox button{height:43px}
+.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:480px}th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:10px 8px;border-bottom:1px solid var(--line)}td{padding:12px 8px;border-bottom:1px solid #eff1f5;font-size:13px}td.amount{text-align:right;font-weight:750;white-space:nowrap}td:last-child{text-align:right}.catpill{display:inline-block;padding:4px 9px;background:#f0efff;color:#5548c8;border-radius:20px;font-size:11px;font-weight:700}
+.empty{text-align:center;padding:32px 10px;color:var(--muted);font-size:13px}
+.breakdown{display:grid;gap:12px}.barline{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;font-size:12px}.track{height:8px;background:#eef0f5;border-radius:10px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px}
+.smallnote{font-size:11px;color:var(--muted);margin-top:12px}.footer{text-align:center;color:#98a1b1;font-size:11px;padding:12px}
+@media(max-width:760px){header{padding:22px 0 68px}.layout{grid-template-columns:1fr}.cards{gap:9px}.metric{padding:14px 12px;border-radius:15px}.metric .label{font-size:10px}.metric .value{font-size:20px}.metric .hint{font-size:10px}.panel{padding:16px}.top{align-items:flex-start}.brand{font-size:20px}}
+@media(max-width:390px){.cards{grid-template-columns:1fr 1fr}.metric:first-child{grid-column:span 2}.rowfields{grid-template-columns:1fr 1fr}.month{max-width:145px;font-size:12px}}
+</style>
+</head>
+<body>
+<header><div class="wrap top"><div><div class="brand">my<span>Budget</span></div><div class="sub">A simple view of where your salary goes.</div></div><input class="month" id="monthPicker" type="month" aria-label="Budget month"></div></header>
+<main>
+<section class="cards">
+ <div class="metric"><div class="label">Monthly salary</div><div class="value" id="salaryDisplay">₹0</div><div class="hint">Your planned take-home income</div></div>
+ <div class="metric"><div class="label">Total allocated</div><div class="value" id="spentDisplay">₹0</div><div class="hint">Investments and other entries</div></div>
+ <div class="metric balance"><div class="label">Balance remaining</div><div class="value" id="balanceDisplay">₹0</div><div class="hint" id="balanceHint">Salary less allocations</div></div>
+</section>
+<div class="layout">
+ <div>
+  <section class="panel">
+   <h2>Monthly income</h2><p class="desc">Set your take-home salary for the selected month.</p>
+   <div class="salarybox"><div class="field"><label for="salary">Salary (₹)</label><input id="salary" type="number" min="0" step="1" placeholder="e.g. 145000"></div><button class="ghost" id="saveSalary">Save</button></div>
+  </section>
+  <section class="panel">
+   <h2>Add an entry</h2><p class="desc">Record an investment, saving, or budget allocation.</p>
+   <div class="field"><label for="entryDate">Date</label><input id="entryDate" type="date"></div>
+   <div class="field"><label for="category">Category</label><select id="category"></select>
+    <div class="addcat"><input id="newCategory" type="text" placeholder="Add your own category"><button class="ghost" id="addCategory">+ Add</button></div>
+   </div>
+   <div class="field"><label for="amount">Amount (₹)</label><input id="amount" type="number" min="0" step="0.01" placeholder="Enter amount"></div>
+   <div class="field"><label for="note">Note (optional)</label><input id="note" type="text" maxlength="80" placeholder="e.g. Monthly SIP"></div>
+   <button class="primary" id="addEntry">＋ Add to budget</button>
+  </section>
+ </div>
+ <div>
+  <section class="panel">
+   <h2>Budget entries</h2><p class="desc" id="entryCount">Your entries for this month appear here.</p>
+   <div class="tablewrap"><table><thead><tr><th>Date</th><th>Category / Note</th><th style="text-align:right">Amount</th><th></th></tr></thead><tbody id="entriesBody"></tbody></table></div>
+   <div class="empty" id="emptyState">No entries yet. Add your first allocation.</div>
+   <div class="actions" style="margin-top:16px"><button class="ghost" id="shareBtn">Share on WhatsApp</button><button class="ghost" id="csvBtn">Export CSV</button></div>
+   <p class="smallnote">WhatsApp opens with a ready-to-send summary. Review it and tap Send.</p>
+  </section>
+  <section class="panel"><h2>Category breakdown</h2><p class="desc">How this month's allocations are distributed.</p><div class="breakdown" id="breakdown"><div class="empty">Your category summary will appear here.</div></div></section>
+ </div>
+</div>
+<div class="footer">Your budget is saved in this browser on this device. No bank connection or account required.</div>
+</main>
+<script>
+const DEFAULT_CATEGORIES=['Investment','SSY','PPF','CHIT','Post Office RD'];
+const $=id=>document.getElementById(id);
+const today=new Date(), localDate=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+const monthKey=d=>d.slice(0,7), money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+let data=JSON.parse(localStorage.getItem('myBudgetData')||'{"salaries":{},"categories":[],"entries":[]}');
+data.salaries ||= {};data.categories ||= [];data.entries ||= [];
+$('monthPicker').value=monthKey(localDate);$('entryDate').value=localDate;
+function save(){localStorage.setItem('myBudgetData',JSON.stringify(data))}
+function currentMonth(){return $('monthPicker').value||monthKey(localDate)}
+function cats(){return [...new Set([...DEFAULT_CATEGORIES,...data.categories])]}
+function renderCategories(){const old=$('category').value;$('category').innerHTML=cats().map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');if(cats().includes(old))$('category').value=old}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ const m=currentMonth(),items=data.entries.filter(e=>monthKey(e.date)===m),total=items.reduce((s,e)=>s+Number(e.amount),0),salary=Number(data.salaries[m]||0),balance=salary-total;
+ $('salary').value=data.salaries[m]??'';$('salaryDisplay').textContent=money(salary);$('spentDisplay').textContent=money(total);$('balanceDisplay').textContent=money(balance);$('balanceDisplay').style.color=balance<0?'var(--red)':'var(--green)';$('balanceHint').textContent=balance<0?'You are over budget by '+money(Math.abs(balance)):'Salary less allocations';
+ $('entryCount').textContent=`${items.length} entr${items.length===1?'y':'ies'} · ${m}`;
+ $('emptyState').style.display=items.length?'none':'block';
+ $('entriesBody').innerHTML=items.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).map(e=>`<tr><td>${new Date(e.date+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</td><td><span class="catpill">${escapeHtml(e.category)}</span>${e.note?`<div style="font-size:11px;color:#8992a3;margin-top:4px">${escapeHtml(e.note)}</div>`:''}</td><td class="amount">${money(e.amount)}</td><td><button class="danger" data-delete="${e.id}" aria-label="Delete entry">✕</button></td></tr>`).join('');
+ const totals={};items.forEach(e=>totals[e.category]=(totals[e.category]||0)+Number(e.amount));
+ const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+ $('breakdown').innerHTML=sorted.length?sorted.map(([c,v])=>`<div class="barline"><span>${escapeHtml(c)}</span><div class="track"><div class="fill" style="width:${total?Math.min(100,v/total*100):0}%"></div></div><strong>${money(v)}</strong></div>`).join(''):'<div class="empty">Your category summary will appear here.</div>';
+}
+$('saveSalary').onclick=()=>{const v=Number($('salary').value);if(v<0||!Number.isFinite(v))return alert('Enter a valid salary amount.');data.salaries[currentMonth()]=v;save();render()};
+$('addCategory').onclick=()=>{const c=$('newCategory').value.trim();if(!c)return;if(cats().some(x=>x.toLowerCase()===c.toLowerCase()))return alert('That category already exists.');data.categories.push(c);$('newCategory').value='';renderCategories();$('category').value=c;save()};
+$('addEntry').onclick=()=>{const date=$('entryDate').value,amount=Number($('amount').value);if(!date)return alert('Please select a date.');if(!Number.isFinite(amount)||amount<=0)return alert('Enter an amount greater than zero.');data.entries.push({id:Date.now()+Math.random(),date,category:$('category').value,amount,note:$('note').value.trim()});save();$('amount').value='';$('note').value='';$('monthPicker').value=monthKey(date);render()};
+$('entriesBody').onclick=e=>{const b=e.target.closest('[data-delete]');if(!b)return;if(confirm('Delete this budget entry?')){data.entries=data.entries.filter(x=>String(x.id)!==b.dataset.delete);save();render()}};
+$('monthPicker').onchange=render;
+function shareText(){
+ const m=currentMonth(),items=data.entries.filter(e=>monthKey(e.date)===m).sort((a,b)=>a.date.localeCompare(b.date)),salary=Number(data.salaries[m]||0),total=items.reduce((s,e)=>s+Number(e.amount),0);
+ const lines=[`MY MONTHLY BUDGET — ${m}`,`Salary: ${money(salary)}`,'','DATE | CATEGORY | AMOUNT','--------------------------------'];
+ items.forEach(e=>lines.push(`${e.date} | ${e.category}${e.note?' - '+e.note:''} | ${money(e.amount)}`));
+ lines.push('--------------------------------',`Total allocated: ${money(total)}`,`Balance: ${money(salary-total)}`,'','Shared from myBudget');
+ return lines.join('\n');
+}
+$('shareBtn').onclick=()=>{if(!data.entries.some(e=>monthKey(e.date)===currentMonth())&&!data.salaries[currentMonth()])return alert('Add your salary or at least one entry first.');window.open('https://wa.me/?text='+encodeURIComponent(shareText()),'_blank')};
+$('csvBtn').onclick=()=>{const m=currentMonth(),items=data.entries.filter(e=>monthKey(e.date)===m),rows=[['Date','Category','Note','Amount'],...items.map(e=>[e.date,e.category,e.note,e.amount])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`budget-${m}.csv`;a.click();URL.revokeObjectURL(a.href)};
+renderCategories();render();
+</script>
+</body></html>
